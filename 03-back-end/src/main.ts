@@ -1,8 +1,11 @@
 import * as express from "express";
 import * as cors from "cors";
 import Config from "./config/dev";
-import CategoryController from './components/category/controller';
+import Router from './router';
+import CategoryRouter from './components/category/router';
 import CategoryService from './components/category/service';
+import IApplicationResources from './common/IApplicationResources.interface';
+import * as mysql2 from "mysql2/promise";
 
 const application : express.Application = express();
 
@@ -21,12 +24,30 @@ application.use(
         dotfiles: Config.server.static.dotfiles,
     }),
 );
+const resources: IApplicationResources = {
+    databaseConnection: await mysql2.createConnection({
+        host: Config.database.host,
+        port: Config.database.port,
+        user: Config.database.user,
+        password: Config.database.password,
+        database: Config.database.database,
+        charset: Config.database.charset,
+        timezone: Config.database.timezone,
+        supportBigNumbers: true,
+    }),
+}
 
-const categoryService: CategoryService = new CategoryService();
-const categoryController: CategoryController = new CategoryController(categoryService);
+resources.databaseConnection.connect();
 
-application.get("/category", categoryController.getAll.bind(categoryController));
-application.get("category/:id/subcategories/:sortOrder")
+resources.services = {
+    categoryService:  new CategoryService(resources),
+
+};
+
+Router.setupRoutes(application, resources, [
+    new CategoryRouter(),
+    // ...
+]);
 
 application.use((req, res) => {
     res.sendStatus(404);

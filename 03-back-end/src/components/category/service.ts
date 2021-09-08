@@ -1,13 +1,15 @@
 import CategoryModel from './model';
 import IErrorResponse from '../../common/IErrorResponse.interface';
+import BaseService from '../../common/BaseService';
+import IModelAdapterOptions from '../../common/IModelAdapterOptions.interface';
 
-class CategoryModelAdapterOptions {
+class CategoryModelAdapterOptions implements IModelAdapterOptions {
     loadParentCategory: boolean = false;
     loadSubcategories: boolean = false;
     loadFeatures: boolean = false;
 }
 
-class CategoryService {
+class CategoryService extends BaseService<CategoryModel> {
     protected async adaptModel(
         row: any,
         options: Partial<CategoryModelAdapterOptions> = { }
@@ -41,13 +43,41 @@ class CategoryService {
             }
         }
 
-        if (options.loadFeatures) {
-            item.features = await this.services.featureService.getAllByCategoryId(item.categoryId);
-        }
-
         return item;
     }
+
+    public async getAll(
+        options: Partial<CategoryModelAdapterOptions> = { },
+    ): Promise<CategoryModel[]|IErrorResponse> {
+        return await this.getAllByFieldNameFromTable<CategoryModelAdapterOptions>(
+            'category',
+            'parent__category_id',
+            null,
+            options,
+        );
+    }
+
+    public async getAllByParentCategoryId(
+        parentCategoryId: number,
+        options: Partial<CategoryModelAdapterOptions> = { },
+    ): Promise<CategoryModel[]|IErrorResponse> {
+        return await this.getAllByFieldNameFromTable<CategoryModelAdapterOptions>(
+            'category',
+            'parent__category_id',
+            parentCategoryId,
+            options,
+        );
+    }
+
+    public async getById(
+        categoryId: number,
+        options: Partial<CategoryModelAdapterOptions> = { },
+    ): Promise<CategoryModel|null|IErrorResponse> {
+        return await this.getByIdFromTable<CategoryModelAdapterOptions>(
+            "category",
+            categoryId,
+            options,
+        );
+    }
 }
-
-
 export default CategoryService;
