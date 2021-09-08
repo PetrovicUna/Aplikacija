@@ -45,6 +45,10 @@ class CategoryService extends BaseService<CategoryModel> {
             }
         }
 
+        if (options.loadFeatures) {
+            item.features = await this.services.featureService.getAllByCategoryId(item.categoryId);
+        }
+
         return item;
     }
 

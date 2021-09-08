@@ -1,3 +1,5 @@
+import FeatureModel from "../feature/model";
+
 class CategoryModel {
     categoryId: number;
     name: string;
@@ -5,7 +7,7 @@ class CategoryModel {
     parentCategoryId: number | null = null;
     parentCategory: CategoryModel | null = null;
     subcategories: CategoryModel[] = [];
-    features: [];
+    features: FeatureModel[] = [];
 }
 
 export default CategoryModel;
