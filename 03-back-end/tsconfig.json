@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
+        "module": "commonjs",
         "declaration": true,
         "removeComments": true,
-        "target": "ES6",
+        "target": "es2017",
         "sourceMap": true,
         "outDir": "./dist",
         /*"typeRoots": [
