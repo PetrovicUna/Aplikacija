@@ -16,5 +16,14 @@ export default class CategoryRouter implements IRouter {
             "/category/:id",
             categoryController.getById.bind(categoryController)
         );
+
+        application.post("/category",
+            categoryController.add.bind(categoryController)
+        );
+
+        application.put(
+            "/category/:id",
+            categoryController.edit.bind(categoryController)
+        );
     }
 }
