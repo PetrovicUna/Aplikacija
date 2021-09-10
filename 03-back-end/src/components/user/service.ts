@@ -1,6 +1,10 @@
 import UserModel from './model';
 import IModelAdapterOptions from '../../common/IModelAdapterOptions.interface';
 import BaseService from '../../common/BaseService';
+import { IAddUser } from './dto/IAddUser';
+import IErrorResponse from '../../common/IErrorResponse.interface';
+import { IEditUser } from './dto/IEditUser';
+import * as bcrypt from "bcrypt";
 
 class UserModelAdapterOptions implements IModelAdapterOptions {
     loadOrders: boolean = false;
@@ -48,5 +52,89 @@ class UserService extends BaseService<UserModel> {
 
         return users[0];
     }
+
+    public async add(data: IAddUser): Promise<UserModel|IErrorResponse> {
+        return new Promise<UserModel|IErrorResponse>(async resolve => {
+            const passwordHash = bcrypt.hashSync(data.password, 11);
+
+            this.db.execute(
+                `INSERT
+                    user
+                SET
+                    email = ?,
+                    password_hash = ?,
+                    forename = ?,
+                    surname = ?,
+                    phone_number = ?,
+                    postal_address = ?,
+                    is_active = 1;`,
+                [
+                    data.email,
+                    passwordHash,
+                    data.forename,
+                    data.surname,
+                    data.phoneNumber,
+                    data.postalAddress,
+                ]
+            )
+            .then(async res => {
+                const newUserId: number = +((res[0] as any)?.insertId);
+                resolve(await this.getById(newUserId));
+            })
+            .catch(error => {
+                resolve({
+                    errorCode: error?.errno,
+                    errorMessage: error?.sqlMessage
+                });
+            })
+        });
+    }
+
+    public async edit(userId: number, data: IEditUser): Promise<UserModel|IErrorResponse|null> {
+        return new Promise<UserModel|IErrorResponse|null>(async resolve => {
+            const currentUser = await this.getById(userId);
+
+            if (currentUser === null) {
+                return resolve(null);
+            }
+
+            const passwordHash = bcrypt.hashSync(data.password, 11);
+
+            this.db.execute(
+                `UPDATE
+                    user
+                 SET
+                    email = ?,
+                    password_hash = ?,
+                    forename = ?,
+                    surname = ?,
+                    phone_number = ?,
+                    postal_address = ?,
+                    is_active = ?
+                 WHERE
+                    user_id = ?;`,
+                [
+                    data.email,
+                    passwordHash,
+                    data.forename,
+                    data.surname,
+                    data.phoneNumber,
+                    data.postalAddress,
+                    data.isActive,
+                    userId,
+                ]
+            )
+            .then(async () => {
+                resolve(await this.getById(userId));
+            })
+            .catch(error => {
+                resolve({
+                    errorCode: error?.errno,
+                    errorMessage: error?.sqlMessage
+                });
+            })
+        });
+    }
+
 }
 export default UserService;
