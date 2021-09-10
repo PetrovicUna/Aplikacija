@@ -135,6 +135,26 @@ class UserService extends BaseService<UserModel> {
             })
         });
     }
-
+    
+    public async delete(userId: number): Promise<IErrorResponse> {
+        return new Promise<IErrorResponse>(async resolve => {
+            this.db.execute(
+                `DELETE FROM user WHERE user_id = ?;`,
+                [ userId, ]
+            )
+            .then(res => {
+                resolve({
+                    errorCode: 0,
+                    errorMessage: `Deleted ${(res as any[])[0]?.affectedRows} records.`
+                });
+            })
+            .catch(error => {
+                resolve({
+                    errorCode: error?.errno,
+                    errorMessage: error?.sqlMessage
+                });
+            });
+        });
+    }
 }
 export default UserService;
