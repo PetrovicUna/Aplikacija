@@ -71,3 +71,4 @@ export default interface IConfig {
         allowRequestsEvenWithoutValidTokens: boolean,
     },
 };
+
