@@ -15,6 +15,7 @@ import AdministratorService from "./components/administrator/service";
 import AdministratorRouter from "./components/administrator/router";
 import UserRouter from './components/user/router';
 import UserService from "./components/user/service";
+import AuthRouter from './components/auth/router';
 
 async function main() {
     const application: express.Application = express();
@@ -80,6 +81,7 @@ async function main() {
         new ArticleRouter(),
         new AdministratorRouter(),
         new UserRouter(),
+        new AuthRouter(),
         // ...
     ]);
 
