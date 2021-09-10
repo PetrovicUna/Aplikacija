@@ -87,6 +87,37 @@ class AdministratorService extends BaseService<AdministratorModel> {
             })
         });
     }
+
+    public async delete(administratorId: number): Promise<IErrorResponse> {
+        return new Promise<IErrorResponse>(async resolve => {
+            this.db.execute(
+                `DELETE FROM administrator WHERE administrator_id = ?;`,
+                [ administratorId, ]
+            )
+            .then(res => {
+                resolve({
+                    errorCode: 0,
+                    errorMessage: `Deleted ${(res as any[])[0]?.affectedRows} records.`
+                });
+            })
+            .catch(error => {
+                resolve({
+                    errorCode: error?.errno,
+                    errorMessage: error?.sqlMessage
+                });
+            });
+        });
+    }
+
+    public async getByUsername(username: string): Promise<AdministratorModel|null> {
+        const administrators = await this.getAllByFieldNameFromTable("administrator", "username", username, {});
+
+        if (!Array.isArray(administrators) || administrators.length === 0) {
+            return null;
+        }
+
+        return administrators[0];
+    }
 }
 
 export default AdministratorService;
