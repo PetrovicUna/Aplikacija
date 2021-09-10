@@ -1,6 +1,7 @@
 import BaseController from '../../common/BaseController';
 import { Request, Response } from "express";
 import { IAddAdministrator, IAddAdministratorValidator } from './dto/IAddAdministrator';
+import { IEditAdministrator, IEditAdministratorValidator } from './dto/IEditAdministrator';
 
 
 export default class AdministratorController extends BaseController {
@@ -26,6 +27,22 @@ export default class AdministratorController extends BaseController {
         }
 
         const result = await this.services.administratorService.add(req.body as IAddAdministrator);
+
+        res.send(result);
+    }
+
+    public async edit(req: Request, res: Response) {
+        const id = +(req.params.id);
+
+        if (id <= 0) return res.status(400).send("The ID value cannot be smaller than 1.");
+
+        if (!IEditAdministratorValidator(req.body)) {
+            return res.status(400).send(IEditAdministratorValidator.errors);
+        }
+
+        const result = await this.services.administratorService.edit(id, req.body as IEditAdministrator);
+
+        if (result === null) return res.sendStatus(404);
 
         res.send(result);
     }

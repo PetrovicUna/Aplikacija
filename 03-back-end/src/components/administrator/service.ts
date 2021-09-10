@@ -4,6 +4,7 @@ import BaseService from '../../common/BaseService';
 import { IAddAdministrator } from './dto/IAddAdministrator';
 import IErrorResponse from '../../common/IErrorResponse.interface';
 import * as bcrypt from "bcrypt";
+import { IEditAdministrator } from './dto/IEditAdministrator';
 
 class AdministratorModelAdapterOptions implements IModelAdapterOptions { }
 
@@ -45,6 +46,38 @@ class AdministratorService extends BaseService<AdministratorModel> {
             .then(async res => {
                 const newAdministratorId: number = +((res[0] as any)?.insertId);
                 resolve(await this.getById(newAdministratorId));
+            })
+            .catch(error => {
+                resolve({
+                    errorCode: error?.errno,
+                    errorMessage: error?.sqlMessage
+                });
+            })
+        });
+    }
+
+    public async edit(administratorId: number, data: IEditAdministrator): Promise<AdministratorModel|IErrorResponse|null> {
+        return new Promise<AdministratorModel|IErrorResponse|null>(async resolve => {
+            const currentAdministrator = await this.getById(administratorId);
+
+            if (currentAdministrator === null) {
+                return resolve(null);
+            }
+
+            const passwordHash = bcrypt.hashSync(data.password, 11);
+
+            this.db.execute(
+                `UPDATE administrator
+                 SET password_hash = ?, is_active = ?
+                 WHERE administrator_id = ?;`,
+                [
+                    passwordHash,
+                    data.isActive ? 1 : 0,
+                    administratorId,
+                ]
+            )
+            .then(async () => {
+                resolve(await this.getById(administratorId));
             })
             .catch(error => {
                 resolve({
