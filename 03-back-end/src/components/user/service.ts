@@ -1,7 +1,7 @@
 import UserModel from './model';
 import IModelAdapterOptions from '../../common/IModelAdapterOptions.interface';
 import BaseService from '../../common/BaseService';
-import { IAddUser } from './dto/IAddUser';
+import { IAddUser, IAddUserValidator } from './dto/IAddUser';
 import IErrorResponse from '../../common/IErrorResponse.interface';
 import { IEditUser } from './dto/IEditUser';
 import * as bcrypt from "bcrypt";
@@ -135,7 +135,7 @@ class UserService extends BaseService<UserModel> {
             })
         });
     }
-    
+
     public async delete(userId: number): Promise<IErrorResponse> {
         return new Promise<IErrorResponse>(async resolve => {
             this.db.execute(
