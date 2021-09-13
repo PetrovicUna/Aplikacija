@@ -39,7 +39,7 @@ async function main() {
         uploadTimeout: Config.fileUpload.timeout,
         safeFileNames: true,
         preserveExtension: true,
-        createParentPath: true,s
+        createParentPath: true,
         abortOnLimit: true,
     }));
     
