@@ -16,6 +16,8 @@ import AdministratorRouter from "./components/administrator/router";
 import UserRouter from './components/user/router';
 import UserService from "./components/user/service";
 import AuthRouter from './components/auth/router';
+import CartRouter from './components/cart/router';
+import CartService from "./components/cart/service";
 
 async function main() {
     const application: express.Application = express();
@@ -37,7 +39,7 @@ async function main() {
         uploadTimeout: Config.fileUpload.timeout,
         safeFileNames: true,
         preserveExtension: true,
-        createParentPath: true,
+        createParentPath: true,s
         abortOnLimit: true,
     }));
     
@@ -62,6 +64,7 @@ async function main() {
         articleService: new ArticleService(resources),
         administratorService: new AdministratorService(resources),
         userService: new UserService(resources),
+        cartService: new CartService(resources),
     };
 
     application.use(
@@ -82,6 +85,7 @@ async function main() {
         new AdministratorRouter(),
         new UserRouter(),
         new AuthRouter(),
+        new CartRouter(),
         // ...
     ]);
 
